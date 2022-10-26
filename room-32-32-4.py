@@ -36,12 +36,12 @@ ylabel_name = "runtime_diff / sec"
 
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
-base_folder = os.path.join(dir_path, "./data_store/never_clear/")
+base_folder = os.path.join(dir_path, "./data_store/clear_5000/")
 base_folder = base_folder + "/" + data_folder_name + "/" + test_model
 
 base_save_pic_name = data_folder_name + "_" + test_model
 
-thesis_report_picture_folder = os.path.join(dir_path, "./thesis_report_picture/never_clear")
+thesis_report_picture_folder = os.path.join(dir_path, "./thesis_report_picture/clear_5000")
 save_pic_folder = thesis_report_picture_folder + "/" + data_folder_name + "/" + test_model + "/" + plot_mode
 
 CREATE_FOLDER_FLAG = True

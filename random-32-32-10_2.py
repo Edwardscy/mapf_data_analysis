@@ -9,17 +9,17 @@ import pathlib
 import math
 from matplotlib.widgets import TextBox
 
-# base_folder = os.path.join(dir_path, './data_store/warehouse-10-20-10-2-1/add_and_delete_obstacles')
-# base_folder = os.path.join(dir_path, './data_store/warehouse-10-20-10-2-1/only_delete_obstacles')
-# base_folder = os.path.join(dir_path, './data_store/warehouse-10-20-10-2-1/only_add_obstacles')
-# test_name = "warehouse-10-20-10-2-1 add_and_delete_obstacles"
+# base_folder = os.path.join(dir_path, './data_store/random-32-32-10/add_and_delete_obstacles')
+# base_folder = os.path.join(dir_path, './data_store/random-32-32-10/only_delete_obstacles')
+# base_folder = os.path.join(dir_path, './data_store/random-32-32-10/only_add_obstacles')
+# test_name = "random-32-32-10 add_and_delete_obstacles"
 
 scen_counts = 25 + 1
-agent_max_counts = 54 + 2
+agent_max_counts = 30 + 2
 agent_start_num = 4
 
 
-data_folder_name = "warehouse-10-20-10-2-1"
+data_folder_name = "random-32-32-10"
 test_model = "add_and_delete_obstacles"
 plot_mode = "runtime"
 
@@ -61,12 +61,14 @@ for i in range(1, scen_counts, 1):
     data_dic["old_cbs"][scen_file_id] = {}
     for j in range(4, agent_max_counts, 2):
         agent_num = str(j)
+        if agent_num in ["20", "22", "26"]:
+            continue
 
         data_dic["new_cbs"][scen_file_id][agent_num] = {}
         data_dic["old_cbs"][scen_file_id][agent_num] = {}
 
-        new_cbs_result_file = base_folder + "/warehouse-10-20-10-2-1-even-" + scen_file_id + "/" + agent_num + "/new_cbs_result.json"
-        old_cbs_result_file = base_folder + "/warehouse-10-20-10-2-1-even-" + scen_file_id + "/" + agent_num + "/old_cbs_result.json"
+        new_cbs_result_file = base_folder + "/random-32-32-10-even-" + scen_file_id + "/" + agent_num + "/new_cbs_result.json"
+        old_cbs_result_file = base_folder + "/random-32-32-10-even-" + scen_file_id + "/" + agent_num + "/old_cbs_result.json"
 
         with open(new_cbs_result_file, 'r') as f:
             data = json.load(f)
@@ -101,6 +103,9 @@ for i in range(1, scen_counts, 1):
 success_rate_statistics = {}
 for i in range(agent_start_num, agent_max_counts, 2):
     agent_num = str(i)
+    if agent_num in ["20", "22", "26"]:
+        continue
+
     success_rate_statistics[agent_num] = {}
     success_rate_statistics[agent_num]["new_cbs_fail"] = 0
     success_rate_statistics[agent_num]["old_cbs_fail"] = 0
@@ -109,6 +114,9 @@ for i in range(agent_start_num, agent_max_counts, 2):
 speed_compare_statistics = {}
 for i in range(agent_start_num, agent_max_counts, 2):
     agent_num = str(i)
+    if agent_num in ["20", "22", "26"]:
+        continue
+
     speed_compare_statistics[agent_num] = {}
     speed_compare_statistics[agent_num]["new_cbs_fast"] = 0
     speed_compare_statistics[agent_num]["old_cbs_fast"] = 0
@@ -118,6 +126,9 @@ for i in range(agent_start_num, agent_max_counts, 2):
 runtime_diff_max_dic = {}
 for j in range(agent_start_num, agent_max_counts, 2):
     agent_num = str(j)
+    if agent_num in ["20", "22", "26"]:
+        continue
+
     runtime_diff_max_dic[agent_num] = 0
 
 runtime_dic = {}
@@ -126,6 +137,9 @@ for i in range(1, scen_counts, 1):
     runtime_dic[scen_file_id] = {}
     for j in range(agent_start_num, agent_max_counts, 2):
         agent_num = str(j)
+        if agent_num in ["20", "22", "26"]:
+            continue
+
         runtime_dic[scen_file_id][agent_num] = []
         for key in data_dic["new_cbs"][scen_file_id][agent_num].keys():
 
@@ -180,6 +194,9 @@ for i in range(1, scen_counts, 1):
     scen_file_id = str(i)
     for j in range(agent_start_num, agent_max_counts, 2):
         agent_num = str(j)
+        if agent_num in ["20", "22", "26"]:
+            continue
+
         for k in range(len(runtime_dic[scen_file_id][agent_num])):
 
             key_str = str(k)
@@ -207,6 +224,8 @@ axv_line_arr = np.array([d*25 for d in range(11)])
 
 for i in range(agent_start_num, agent_max_counts, 2):
     agent_num = str(i)
+    if agent_num in ["20", "22", "26"]:
+        continue
 
     fig = plt.figure(figsize=(14, 8))
     ax = plt.axes()

@@ -20,7 +20,7 @@ agent_start_num = 4
 
 
 data_folder_name = "random-32-32-10"
-test_model = "only_add_obstacles"
+test_model = "add_and_delete_obstacles"
 plot_mode = "runtime"
 
 def get_test_model(mode):
@@ -106,6 +106,15 @@ for i in range(agent_start_num, agent_max_counts, 2):
     success_rate_statistics[agent_num]["old_cbs_fail"] = 0
     success_rate_statistics[agent_num]["total_count"] = 0
 
+speed_compare_statistics = {}
+for i in range(agent_start_num, agent_max_counts, 2):
+    agent_num = str(i)
+    speed_compare_statistics[agent_num] = {}
+    speed_compare_statistics[agent_num]["new_cbs_fast"] = 0
+    speed_compare_statistics[agent_num]["old_cbs_fast"] = 0
+    speed_compare_statistics[agent_num]["total_count"] = 0
+
+
 runtime_diff_max_dic = {}
 for j in range(agent_start_num, agent_max_counts, 2):
     agent_num = str(j)
@@ -136,19 +145,28 @@ for i in range(1, scen_counts, 1):
                 if abs(runtime_diff) > runtime_diff_max_dic[agent_num]:
                     runtime_diff_max_dic[agent_num] = abs(runtime_diff)
 
+                if runtime_diff < 0:
+                    speed_compare_statistics[agent_num]["new_cbs_fast"] += 1
+                elif runtime_diff > 0:
+                    speed_compare_statistics[agent_num]["old_cbs_fast"] += 1
+
+
             elif new_cbs_result != "Optimal" and old_cbs_result == "Optimal":
                 runtime_dic[scen_file_id][agent_num].append("new")
                 print("new_cbs_result", scen_file_id, agent_num)
                 success_rate_statistics[agent_num]["new_cbs_fail"] += 1
+                speed_compare_statistics[agent_num]["old_cbs_fast"] += 1
             elif new_cbs_result == "Optimal" and old_cbs_result != "Optimal":
                 runtime_dic[scen_file_id][agent_num].append("old")
                 print("old_cbs_result", scen_file_id, agent_num)
                 success_rate_statistics[agent_num]["old_cbs_fail"] += 1
+                speed_compare_statistics[agent_num]["new_cbs_fast"] += 1
             elif new_cbs_result != "Optimal" and old_cbs_result != "Optimal":
                 runtime_dic[scen_file_id][agent_num].append("all")
                 success_rate_statistics[agent_num]["new_cbs_fail"] += 1
                 success_rate_statistics[agent_num]["old_cbs_fail"] += 1
             success_rate_statistics[agent_num]["total_count"] += 1
+            speed_compare_statistics[agent_num]["total_count"] += 1
 
 
 for key, value in success_rate_statistics.items():
@@ -190,8 +208,11 @@ axv_line_arr = np.array([d*25 for d in range(11)])
 for i in range(agent_start_num, agent_max_counts, 2):
     agent_num = str(i)
 
-    fig = plt.figure(figsize=(15, 8))
+    fig = plt.figure(figsize=(14, 8))
     ax = plt.axes()
+
+    plt.xticks(fontsize=20)
+    plt.yticks(fontsize=10)
 
     plt.yscale("symlog")
 
@@ -220,8 +241,8 @@ for i in range(agent_start_num, agent_max_counts, 2):
 
     runtime_diff_max = runtime_diff_max_dic[agent_num]
 
-    plt.text(-9.6, runtime_diff_max+offset_value, 'Lifelong CBS Timeout', color="red")
-    plt.text(-7, (-1)*(runtime_diff_max+offset_value), 'CBS Timeout', color="red")
+    plt.text(-3.5, runtime_diff_max+offset_value/10, 'Dynamic CBS Timeout', color="red",rotation=90,fontsize=10)
+    plt.text(-3.5, (-1)*(runtime_diff_max+offset_value/1.0), 'CBS Timeout', color="red",rotation=90,fontsize=10)
 
     plt.axhline(y=runtime_diff_max + offset_value, color="g", linestyle="--")
     plt.axhline(y=0, color="g", linestyle="--")
@@ -256,8 +277,6 @@ for i in range(agent_start_num, agent_max_counts, 2):
 
         plt.scatter(x_array, y_array, marker="o", s=50, alpha=0.5)
 
-
-
         # plt.xticks(x_array)
         # ["Jan\n2009", "Feb\n2009", "Mar\n2009", "Apr\n2009", "May\n2009"])
 
@@ -273,22 +292,31 @@ for i in range(agent_start_num, agent_max_counts, 2):
     new_cbs_success_rate = new_cbs_success_count/total_count
     old_cbs_success_rate = old_cbs_success_count / total_count
 
+    ##########################################################
+    new_cbs_fast_count = speed_compare_statistics[agent_num]["new_cbs_fast"]
+    old_cbs_fast_count = speed_compare_statistics[agent_num]["old_cbs_fast"]
+
+
+
+    ##########################################################
     save_pic_name = base_save_pic_name + " agent_num " + agent_num
     save_pic_name_path = save_pic_folder + "/" + save_pic_name + ".png"
-    plt.xlabel(xlabel_name)
-    plt.ylabel(ylabel_name)
-    result_infos = "Lifelong CBS success rate:" + str(new_cbs_success_rate) + "\n" + \
+    plt.xlabel(xlabel_name, fontsize=20)
+    plt.ylabel(ylabel_name, fontsize=20)
+    result_infos =  "Dynamic CBS fast count: " + str(new_cbs_fast_count) + "\n" + \
+                    "CBS fast count: " + str(old_cbs_fast_count) + "\n" + \
+                    "Dynamic CBS success rate:" + str(new_cbs_success_rate) + "\n" + \
                     "CBS success rate: " + str(old_cbs_success_rate) + "\n" + \
-                    "Lifelong CBS success count: " + str(new_cbs_success_count) + "\n" + \
+                    "Dynamic CBS success count: " + str(new_cbs_success_count) + "\n" + \
                     "CBS success count: " + str(old_cbs_success_count) + "\n" + \
                     "Total count: " + str(total_count)
 
     title_name = "Map name: " + data_folder_name + "\n" + \
                  get_test_model(test_model) + "\n" + \
-                 "Agent_num " + agent_num
+                 "Agent_num: " + agent_num
 
     # plt.title(save_pic_name + "\n")
-    plt.title(title_name)
+    plt.title(title_name, fontsize=18)
 
     locs, labels = plt.xticks([d for d in range(0, 55, 5)], rotation=0)
 
@@ -308,7 +336,7 @@ for i in range(agent_start_num, agent_max_counts, 2):
     #     0, 1, "Direction", ha="center", va="center", rotation=0, size=15,
     #     bbox=dict(boxstyle="rarrow", fc="w", ec="black", lw=2))
     t = ax.text(
-        46.5, -50, result_infos, ha="center", va="center", rotation=0, size=10,
+        45, 50, result_infos, ha="center", va="center", rotation=0, size=12,
         bbox=dict(boxstyle="rarrow", fc="w", ec="black", lw=2, alpha=0.6))
     bb = t.get_bbox_patch()
     bb.set_boxstyle("Round", pad=0.6)
